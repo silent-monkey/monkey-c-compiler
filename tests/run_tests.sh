@@ -1,7 +1,13 @@
 #!/bin/bash
 # Run all mcc tests
+# Execute from the project root:  bash tests/run_tests.sh
 
-MCC="./target/debug/mcc"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+cd "$PROJECT_ROOT"
+
+MCC="$PROJECT_ROOT/target/debug/mcc"
+
 TESTS=(
     test_return:42
     test_simple_var:42
@@ -32,30 +38,33 @@ FAIL=0
 for entry in "${TESTS[@]}"; do
     test="${entry%%:*}"
     expected="${entry##*:}"
-    
+    src="tests/${test}.c"
+
     echo -n "  $test ... "
-    
-    if ! "$MCC" "$test.c" 2>/dev/null; then
+
+    if ! "$MCC" "$src" 2>/dev/null; then
         echo "FAIL (mcc compilation error)"
         FAIL=$((FAIL + 1))
         continue
     fi
-    
-    if ! riscv64-linux-gnu-as -o "/tmp/$test.o" "$test.s" 2>/dev/null; then
+
+    # mcc outputs to tests/${test}.s by default
+
+    if ! riscv64-linux-gnu-as -o "/tmp/${test}.o" "tests/${test}.s" 2>/dev/null; then
         echo "FAIL (assembler error)"
         FAIL=$((FAIL + 1))
         continue
     fi
-    
-    if ! riscv64-linux-gnu-ld -o "/tmp/$test.riscv" "/tmp/$test.o" 2>/dev/null; then
+
+    if ! riscv64-linux-gnu-ld -o "/tmp/${test}.riscv" "/tmp/${test}.o" 2>/dev/null; then
         echo "FAIL (linker error)"
         FAIL=$((FAIL + 1))
         continue
     fi
-    
-    qemu-riscv64-static "/tmp/$test.riscv" 2>/dev/null
+
+    qemu-riscv64-static "/tmp/${test}.riscv" 2>/dev/null
     actual=$?
-    
+
     if [ "$actual" = "$expected" ]; then
         echo "OK (ret=$actual)"
         PASS=$((PASS + 1))
