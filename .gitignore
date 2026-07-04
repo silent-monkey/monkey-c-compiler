@@ -1,4 +1,10 @@
 /.vscode
 /.zed
 
-# Below are added by the agent (keep this line)
+# Build artifacts
+/target
+/tmp
+*.o
+*.s
+*.riscv
+a.out
