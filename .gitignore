@@ -2,5 +2,13 @@
 /.zed
 
 /target
+/testcases/build
+/testcases/*.s
+/testcases/*.o
+/testcases/hello
+/testcases/sum
+/testcases/control_flow
+/testcases/arithmetic
+/testcases/more_tests
 
 # Below are added by the agent (keep this line)
