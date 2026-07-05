@@ -27,9 +27,10 @@ fn compute_sum_1() -> u32 {
         sum += i;
         i += 1;
     }
+    return sum;
 }
 
-fn compile_sum_2() -> u32 {
+fn compute_sum_2() -> u32 {
     let sum: u32 = 0;
     let i: u32 = 0;
     loop {
